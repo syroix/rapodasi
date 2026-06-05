@@ -2,54 +2,24 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rap Odası | Profesyonel Yayın</title>
+    <title>Rap Odası</title>
     <style>
-        /* Tasarım Kodları (Satırları çoğaltıyoruz) */
-        body { font-family: 'Arial', sans-serif; background: linear-gradient(135deg, #0f0f0f, #2c001e); color: #fff; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        header { width: 100%; padding: 40px; text-align: center; border-bottom: 2px solid #ff0055; background: rgba(0,0,0,0.5); }
-        .container { width: 80%; max-width: 900px; margin: 20px 0; }
-        .sarki-kartı { background: rgba(255, 255, 255, 0.05); padding: 30px; margin-bottom: 20px; border-radius: 15px; border: 1px solid #444; transition: 0.3s; }
-        .sarki-kartı:hover { transform: scale(1.02); border-color: #ff0055; }
-        h1 { font-size: 3em; margin: 0; color: #ff0055; text-shadow: 2px 2px 10px #000; }
-        .btn-grup { padding: 40px; }
-        button, a { padding: 15px 30px; margin: 10px; cursor: pointer; border-radius: 50px; text-decoration: none; font-weight: bold; }
-        .istek { background: #00ff88; color: #000; }
-        .admin { background: #ff0055; color: #fff; border: none; }
+        body { background-color: #000; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
+        .sarki-alani { background-color: #1a1a1a; padding: 20px; border-radius: 10px; margin: 20px auto; max-width: 600px; text-align: left; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Rap Odası</h1>
-        <p>En sert beatler, en gerçek sözler burada.</p>
-    </header>
+    <h1>Rap Odası</h1>
 
-    <div class="container">
-        <div class="sarki-kartı">
-            <h2>Siyah Poşet</h2>
-            <p>Söz 1: Karanlık sokaklarda yürüdüm gece...</p>
-            <p>Söz 2: Rap benim için bir hayat bilmecesi...</p>
-        </div>
-
-        <div class="sarki-kartı">
-            <h2>İkinci Şarkı Adı</h2>
-            <p>Söz 1: Beatler yükselir gökyüzüne doğru...</p>
-            <p>Söz 2: Her kelime bir kurşun, hedeflerim doğru...</p>
-        </div>
-
-        </div>
-
-    <div class="btn-grup">
-        <a href="#" class="istek">İstek & Şikayet</a>
-        <button onclick="admin()" class="admin">Admin Girişi</button>
+    <div class="sarki-alani">
+        <h2>Siyah Poşet</h2>
+        <p>
+            Buraya şarkı sözlerini yazabilirsin.<br>
+            Alt satıra geçmek için &lt;br&gt; yazman yeterli.<br>
+            Bu kod hata vermez, ses çıkarmaz.
+        </p>
     </div>
 
-    <script>
-        function admin() {
-            let sifre = prompt("Admin Şifresi:");
-            if (sifre === "1234") { window.location.href = "https://github.com/syroix/rapodasi/edit/main/index.html"; }
-        }
-    </script>
 </body>
 </html>
