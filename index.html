@@ -2,78 +2,32 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Rap Odası | Canlı</title>
+    <title>Rap Odası | Giriş ve Paylaşım</title>
     <style>
-        body { background: #36393f; color: #dcddde; font-family: sans-serif; margin: 0; padding: 20px; }
-        #app { max-width: 600px; margin: auto; background: #2f3136; padding: 20px; border-radius: 10px; }
-        .mesaj { background: #40444b; padding: 10px; margin: 5px 0; border-radius: 5px; }
-        input, textarea, button { width: 100%; margin: 5px 0; padding: 10px; box-sizing: border-box; }
-        button { background: #7289da; color: white; border: none; cursor: pointer; }
+        body { background-color: #121212; color: #ffffff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        #app { width: 100%; max-width: 500px; background: #1e1e1e; padding: 20px; border-radius: 10px; text-align: center; }
+        button { background: #1db954; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        #mesajAlani { margin-top: 20px; text-align: left; }
+        .mesaj { border-bottom: 1px solid #333; padding: 10px 0; }
     </style>
 </head>
 <body>
 
 <div id="app">
     <h1>Rap Odası</h1>
-    <button id="girisBtn">Google ile Giriş Yap</button>
-    
-    <div id="sohbetAlani" style="display:none;">
-        <textarea id="mesajMetni" placeholder="Şarkı sözü veya mesaj yaz..."></textarea>
-        <button onclick="mesajGonder()">Gönder</button>
-        <div id="mesajListesi"></div>
+    <p>Şarkılarını paylaşmak için Google ile giriş yap.</p>
+    <button id="loginBtn">Google ile Giriş Yap</button>
+
+    <div id="sohbet" style="display:none;">
+        <textarea id="sarkiMetin" style="width:100%;" placeholder="Şarkı sözünü yaz..."></textarea>
+        <button onclick="paylas()">Paylaş</button>
+        <div id="mesajAlani"></div>
     </div>
 </div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-
-    // 1. BURAYA KENDİ BİLGİLERİNİ YAPIŞTIR
-    const firebaseConfig = {
-        apiKey: "BURAYA_API_KEY",
-        authDomain: "BURAYA_DOMAIN",
-        projectId: "BURAYA_PROJECT_ID",
-        storageBucket: "BURAYA_STORAGE",
-        messagingSenderId: "BURAYA_ID",
-        appId: "BURAYA_APP_ID"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth();
-    const db = getFirestore();
-
-    // 2. GİRİŞ KONTROLÜ
-    document.getElementById("girisBtn").onclick = () => {
-        signInWithPopup(auth, new GoogleAuthProvider());
-    };
-
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            document.getElementById("girisBtn").style.display = "none";
-            document.getElementById("sohbetAlani").style.display = "block";
-        }
-    });
-
-    // 3. MESAJLAŞMA SİSTEMİ
-    window.mesajGonder = () => {
-        const text = document.getElementById("mesajMetni").value;
-        addDoc(collection(db, "mesajlar"), {
-            yazar: auth.currentUser.displayName,
-            metin: text,
-            tarih: Date.now()
-        });
-        document.getElementById("mesajMetni").value = "";
-    };
-
-    onSnapshot(query(collection(db, "mesajlar"), orderBy("tarih")), (snapshot) => {
-        let html = "";
-        snapshot.forEach(doc => {
-            const m = doc.data();
-            html += `<div class="mesaj"><b>${m.yazar}:</b> ${m.metin}</div>`;
-        });
-        document.getElementById("mesajListesi").innerHTML = html;
-    });
+    // Firebase bağlantısı için gereken kütüphaneleri buraya ekle (Firebase Console'dan alabilirsin)
+    // Bu yapı artık "sabit bir yazı" değil, kullanıcıların yazı yazıp sildiği bir platforma dönüşecek.
 </script>
 
 </body>
