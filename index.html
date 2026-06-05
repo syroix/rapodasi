@@ -2,51 +2,57 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Rap Odası</title>
+    <title>Rap Odası | Admin Panelli</title>
     <style>
-        body { background: #121212; color: #fff; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
-        .container { width: 100%; max-width: 500px; background: #1e1e1e; padding: 20px; border-radius: 10px; }
-        input { width: 70%; padding: 10px; border-radius: 5px; border: none; }
-        button { padding: 10px; background: #1db954; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        #mesajListesi { margin-top: 20px; border-top: 1px solid #333; padding-top: 10px; }
-        .mesaj { background: #2a2a2a; padding: 8px; margin: 5px 0; border-radius: 5px; }
+        body { background: #121212; color: #fff; font-family: sans-serif; padding: 20px; }
+        .container { max-width: 500px; margin: auto; }
+        .mesaj { background: #222; padding: 10px; margin: 5px 0; border-radius: 5px; }
+        input { width: 100%; padding: 10px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>Rap Odası</h1>
-    <input type="text" id="mesajGirdi" placeholder="Rap'ini veya mesajını yaz...">
-    <button onclick="mesajEkle()">Gönder</button>
+    <input type="text" id="isim" placeholder="Adını gir...">
+    <input type="text" id="mesajGirdi" placeholder="Mesajını yaz...">
+    <button onclick="gonder()">Gönder</button>
     <div id="mesajListesi"></div>
 </div>
 
 <script>
-    // Sayfa açıldığında eski mesajları yükle
-    window.onload = mesajlariYukle;
+    // 1. AYARLAR
+    const adminler = ["Syroix", "Admin"]; // Admin isimlerini buraya yaz
+    let banliKullanicilar = JSON.parse(localStorage.getItem("banlilar") || "{}");
 
-    function mesajEkle() {
-        let girdi = document.getElementById("mesajGirdi");
-        let mesajlar = JSON.parse(localStorage.getItem("rapMesajlari") || "[]");
-        
-        if (girdi.value.trim() !== "") {
-            mesajlar.push(girdi.value);
-            localStorage.setItem("rapMesajlari", JSON.stringify(mesajlar));
-            girdi.value = "";
-            mesajlariYukle();
+    function gonder() {
+        let isim = document.getElementById("isim").value;
+        let mesaj = document.getElementById("mesajGirdi").value;
+
+        // 2. BAN KONTROLÜ
+        if (banliKullanicilar[isim]) {
+            alert("Banlısın, yazamazsın!");
+            return;
         }
-    }
 
-    function mesajlariYukle() {
-        let mesajlar = JSON.parse(localStorage.getItem("rapMesajlari") || "[]");
-        let liste = document.getElementById("mesajListesi");
-        liste.innerHTML = "";
-        mesajlar.forEach(mesaj => {
-            let div = document.createElement("div");
-            div.className = "mesaj";
-            div.innerText = mesaj;
-            liste.appendChild(div);
-        });
+        // 3. ADMIN KOMUTLARI
+        if (adminler.includes(isim) && mesaj.startsWith("/")) {
+            let komut = mesaj.split(" ");
+            if (komut[0] === "/ban") {
+                let hedef = komut[1];
+                banliKullanicilar[hedef] = true;
+                localStorage.setItem("banlilar", JSON.stringify(banliKullanicilar));
+                alert(hedef + " banlandı!");
+            }
+            return;
+        }
+
+        // Mesajı ekrana bas (Admin değilse mesajı göster)
+        let div = document.createElement("div");
+        div.className = "mesaj";
+        div.innerHTML = `<b>${isim}:</b> ${mesaj}`;
+        document.getElementById("mesajListesi").appendChild(div);
+        document.getElementById("mesajGirdi").value = "";
     }
 </script>
 
