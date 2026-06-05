@@ -2,32 +2,52 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Rap Odası | Giriş ve Paylaşım</title>
+    <title>Rap Odası</title>
     <style>
-        body { background-color: #121212; color: #ffffff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        #app { width: 100%; max-width: 500px; background: #1e1e1e; padding: 20px; border-radius: 10px; text-align: center; }
-        button { background: #1db954; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-        #mesajAlani { margin-top: 20px; text-align: left; }
-        .mesaj { border-bottom: 1px solid #333; padding: 10px 0; }
+        body { background: #121212; color: #fff; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
+        .container { width: 100%; max-width: 500px; background: #1e1e1e; padding: 20px; border-radius: 10px; }
+        input { width: 70%; padding: 10px; border-radius: 5px; border: none; }
+        button { padding: 10px; background: #1db954; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        #mesajListesi { margin-top: 20px; border-top: 1px solid #333; padding-top: 10px; }
+        .mesaj { background: #2a2a2a; padding: 8px; margin: 5px 0; border-radius: 5px; }
     </style>
 </head>
 <body>
 
-<div id="app">
+<div class="container">
     <h1>Rap Odası</h1>
-    <p>Şarkılarını paylaşmak için Google ile giriş yap.</p>
-    <button id="loginBtn">Google ile Giriş Yap</button>
-
-    <div id="sohbet" style="display:none;">
-        <textarea id="sarkiMetin" style="width:100%;" placeholder="Şarkı sözünü yaz..."></textarea>
-        <button onclick="paylas()">Paylaş</button>
-        <div id="mesajAlani"></div>
-    </div>
+    <input type="text" id="mesajGirdi" placeholder="Rap'ini veya mesajını yaz...">
+    <button onclick="mesajEkle()">Gönder</button>
+    <div id="mesajListesi"></div>
 </div>
 
-<script type="module">
-    // Firebase bağlantısı için gereken kütüphaneleri buraya ekle (Firebase Console'dan alabilirsin)
-    // Bu yapı artık "sabit bir yazı" değil, kullanıcıların yazı yazıp sildiği bir platforma dönüşecek.
+<script>
+    // Sayfa açıldığında eski mesajları yükle
+    window.onload = mesajlariYukle;
+
+    function mesajEkle() {
+        let girdi = document.getElementById("mesajGirdi");
+        let mesajlar = JSON.parse(localStorage.getItem("rapMesajlari") || "[]");
+        
+        if (girdi.value.trim() !== "") {
+            mesajlar.push(girdi.value);
+            localStorage.setItem("rapMesajlari", JSON.stringify(mesajlar));
+            girdi.value = "";
+            mesajlariYukle();
+        }
+    }
+
+    function mesajlariYukle() {
+        let mesajlar = JSON.parse(localStorage.getItem("rapMesajlari") || "[]");
+        let liste = document.getElementById("mesajListesi");
+        liste.innerHTML = "";
+        mesajlar.forEach(mesaj => {
+            let div = document.createElement("div");
+            div.className = "mesaj";
+            div.innerText = mesaj;
+            liste.appendChild(div);
+        });
+    }
 </script>
 
 </body>
