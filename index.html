@@ -91,3 +91,45 @@
 
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Rap Odası</title>
+    <style>
+        body { background: #121212; color: #fff; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
+        .container { width: 100%; max-width: 500px; background: #1e1e1e; padding: 20px; border-radius: 10px; }
+        .mesaj { background: #2a2a2a; padding: 10px; margin: 8px 0; border-radius: 5px; }
+        input { width: 70%; padding: 10px; border-radius: 5px; border: none; }
+        button { padding: 10px; background: #1db954; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Rap Odası</h1>
+    <input type="text" id="isimGirdi" placeholder="Adın ne?">
+    <input type="text" id="mesajGirdi" placeholder="Mesaj yaz...">
+    <button onclick="gonder()">Gönder</button>
+    <div id="mesajListesi"></div>
+</div>
+
+<script>
+    function gonder() {
+        let isim = document.getElementById("isimGirdi").value;
+        let mesaj = document.getElementById("mesajGirdi").value;
+        
+        if (isim === "" || mesaj === "") { alert("İsim ve mesaj boş olamaz!"); return; }
+
+        let liste = document.getElementById("mesajListesi");
+        let yeniMesaj = document.createElement("div");
+        yeniMesaj.className = "mesaj";
+        yeniMesaj.innerHTML = `<b>${isim}:</b> ${mesaj}`;
+        liste.prepend(yeniMesaj);
+        
+        document.getElementById("mesajGirdi").value = "";
+    }
+</script>
+
+</body>
+</html>
