@@ -2,41 +2,97 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Rap Odası</title>
+    <title>Flow Arena | Admin Destekli</title>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        // BURAYA FIREBASE BİLGİLERİNİ YAZ
+        const firebaseConfig = { apiKey: "...", authDomain: "...", projectId: "...", storageBucket: "...", messagingSenderId: "...", appId: "..." };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+        const db = getFirestore();
+        const provider = new GoogleAuthProvider();
+
+        window.googleGiris = () => signInWithPopup(auth, provider);
+
+        // Şifreli Admin Girişi
+        window.adminGiris = () => {
+            const sifre = prompt("Admin Şifresini Gir:");
+            if (sifre === "2013burak2013") {
+                document.getElementById("adminPaneli").style.display = "block";
+                alert("Admin Paneline Hoşgeldin!");
+            } else {
+                alert("Hatalı Şifre!");
+            }
+        };
+
+        window.mesajGonder = () => {
+            const input = document.getElementById("mesajInput");
+            if (input.value.trim() !== "") {
+                addDoc(collection(db, "mesajlar"), {
+                    yazan: auth.currentUser.displayName,
+                    foto: auth.currentUser.photoURL,
+                    metin: input.value,
+                    tarih: serverTimestamp()
+                });
+                input.value = "";
+            }
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById("girisEkrani").style.display = "none";
+                document.getElementById("sohbetEkrani").style.display = "flex";
+            }
+        });
+
+        onSnapshot(query(collection(db, "mesajlar"), orderBy("tarih")), (snapshot) => {
+            const liste = document.getElementById("mesajListesi");
+            liste.innerHTML = "";
+            snapshot.forEach(doc => {
+                const m = doc.data();
+                liste.innerHTML += `<div class="msg"><img src="${m.foto}"><b>${m.yazan}:</b> ${m.metin}</div>`;
+            });
+            liste.scrollTop = liste.scrollHeight;
+        });
+    </script>
     <style>
-        body { background: #121212; color: #fff; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
-        .container { width: 100%; max-width: 500px; background: #1e1e1e; padding: 20px; border-radius: 10px; }
-        .mesaj { background: #2a2a2a; padding: 10px; margin: 8px 0; border-radius: 5px; }
-        input { width: 70%; padding: 10px; border-radius: 5px; border: none; }
-        button { padding: 10px; background: #1db954; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        body { background: #121212; color: #fff; font-family: sans-serif; margin: 0; }
+        #sohbetEkrani { display: none; height: 100vh; flex-direction: column; padding: 20px; }
+        #adminPaneli { display: none; background: #333; padding: 20px; margin-top: 10px; border: 2px solid #1db954; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; }
+        #mesajListesi { flex-grow: 1; overflow-y: auto; background: #181818; padding: 15px; border-radius: 8px; }
+        .msg { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .msg img { width: 30px; border-radius: 50%; }
+        button { background: #1db954; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; color: black; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Rap Odası</h1>
-    <input type="text" id="isimGirdi" placeholder="Adın ne?">
-    <input type="text" id="mesajGirdi" placeholder="Mesaj yaz...">
-    <button onclick="gonder()">Gönder</button>
-    <div id="mesajListesi"></div>
-</div>
+    <div id="girisEkrani" style="text-align:center; padding-top:200px;">
+        <h1>Flow Arena</h1>
+        <button onclick="googleGiris()">Google ile Giriş Yap</button>
+    </div>
 
-<script>
-    function gonder() {
-        let isim = document.getElementById("isimGirdi").value;
-        let mesaj = document.getElementById("mesajGirdi").value;
+    <div id="sohbetEkrani">
+        <div class="top-bar">
+            <h2>Rap Odası</h2>
+            <button onclick="adminGiris()">RapOdasıAdmin</button>
+        </div>
         
-        if (isim === "" || mesaj === "") { alert("İsim ve mesaj boş olamaz!"); return; }
+        <div id="adminPaneli">
+            <h3>Admin Paneli (Şifre Onaylandı)</h3>
+            <p>Buraya ban listesi veya ayarları ekleyebilirsin.</p>
+        </div>
 
-        let liste = document.getElementById("mesajListesi");
-        let yeniMesaj = document.createElement("div");
-        yeniMesaj.className = "mesaj";
-        yeniMesaj.innerHTML = `<b>${isim}:</b> ${mesaj}`;
-        liste.prepend(yeniMesaj);
-        
-        document.getElementById("mesajGirdi").value = "";
-    }
-</script>
+        <div id="mesajListesi"></div>
+        <div style="margin-top:10px;">
+            <input type="text" id="mesajInput" placeholder="Rapini yaz...">
+            <button onclick="mesajGonder()">Gönder</button>
+        </div>
+    </div>
 
 </body>
 </html>
