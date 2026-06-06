@@ -2,59 +2,92 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Rap Odası | Admin Panelli</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flow Arena | Rap Odası</title>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        // BURAYA KENDİ FIREBASE BİLGİLERİNİ GİR
+        const firebaseConfig = {
+            apiKey: "SENİN_API_KEY",
+            authDomain: "SENİN_PROJE.firebaseapp.com",
+            projectId: "SENİN_PROJE_ID",
+            storageBucket: "SENİN_PROJE.appspot.com",
+            messagingSenderId: "SENİN_SENDER_ID",
+            appId: "SENİN_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+        const db = getFirestore();
+        const provider = new GoogleAuthProvider();
+
+        // Giriş Yapma
+        window.googleGiris = () => signInWithPopup(auth, provider);
+
+        // Mesaj Gönderme
+        window.mesajGonder = () => {
+            const input = document.getElementById("mesajInput");
+            if (input.value.trim() !== "") {
+                addDoc(collection(db, "mesajlar"), {
+                    yazan: auth.currentUser.displayName,
+                    foto: auth.currentUser.photoURL,
+                    metin: input.value,
+                    tarih: serverTimestamp()
+                });
+                input.value = "";
+            }
+        };
+
+        // UI Güncelleme
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById("girisEkrani").style.display = "none";
+                document.getElementById("sohbetEkrani").style.display = "block";
+            }
+        });
+
+        // Canlı Mesaj Akışı
+        onSnapshot(query(collection(db, "mesajlar"), orderBy("tarih")), (snapshot) => {
+            const liste = document.getElementById("mesajListesi");
+            liste.innerHTML = "";
+            snapshot.forEach(doc => {
+                const m = doc.data();
+                liste.innerHTML += `
+                    <div class="msg">
+                        <img src="${m.foto}" width="30">
+                        <div><b>${m.yazan}:</b><br>${m.metin}</div>
+                    </div>`;
+            });
+            liste.scrollTop = liste.scrollHeight;
+        });
+    </script>
+
     <style>
-        body { background: #121212; color: #fff; font-family: sans-serif; padding: 20px; }
-        .container { max-width: 500px; margin: auto; }
-        .mesaj { background: #222; padding: 10px; margin: 5px 0; border-radius: 5px; }
-        input { width: 100%; padding: 10px; margin-bottom: 10px; }
+        body { background: #121212; color: white; font-family: sans-serif; display: flex; justify-content: center; height: 100vh; margin: 0; }
+        #sohbetEkrani { display: none; width: 100%; max-width: 500px; padding: 20px; }
+        #mesajListesi { height: 70vh; overflow-y: auto; background: #1e1e1e; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
+        .msg { background: #2a2a2a; padding: 10px; margin: 8px 0; border-radius: 8px; display: flex; align-items: center; gap: 10px; }
+        input { width: 75%; padding: 10px; border-radius: 5px; border: none; }
+        button { padding: 10px; background: #1db954; color: white; border: none; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Rap Odası</h1>
-    <input type="text" id="isim" placeholder="Adını gir...">
-    <input type="text" id="mesajGirdi" placeholder="Mesajını yaz...">
-    <button onclick="gonder()">Gönder</button>
-    <div id="mesajListesi"></div>
-</div>
+    <div id="girisEkrani" style="text-align:center; padding-top:100px;">
+        <h1>Flow Arena</h1>
+        <p>Giriş yap ve rap'e başla.</p>
+        <button onclick="googleGiris()">Google ile Giriş Yap</button>
+    </div>
 
-<script>
-    // 1. AYARLAR
-    const adminler = ["Syroix", "Admin"]; // Admin isimlerini buraya yaz
-    let banliKullanicilar = JSON.parse(localStorage.getItem("banlilar") || "{}");
-
-    function gonder() {
-        let isim = document.getElementById("isim").value;
-        let mesaj = document.getElementById("mesajGirdi").value;
-
-        // 2. BAN KONTROLÜ
-        if (banliKullanicilar[isim]) {
-            alert("Banlısın, yazamazsın!");
-            return;
-        }
-
-        // 3. ADMIN KOMUTLARI
-        if (adminler.includes(isim) && mesaj.startsWith("/")) {
-            let komut = mesaj.split(" ");
-            if (komut[0] === "/ban") {
-                let hedef = komut[1];
-                banliKullanicilar[hedef] = true;
-                localStorage.setItem("banlilar", JSON.stringify(banliKullanicilar));
-                alert(hedef + " banlandı!");
-            }
-            return;
-        }
-
-        // Mesajı ekrana bas (Admin değilse mesajı göster)
-        let div = document.createElement("div");
-        div.className = "mesaj";
-        div.innerHTML = `<b>${isim}:</b> ${mesaj}`;
-        document.getElementById("mesajListesi").appendChild(div);
-        document.getElementById("mesajGirdi").value = "";
-    }
-</script>
+    <div id="sohbetEkrani">
+        <div id="mesajListesi"></div>
+        <input type="text" id="mesajInput" placeholder="Sözlerini yaz...">
+        <button onclick="mesajGonder()">Gönder</button>
+    </div>
 
 </body>
 </html>
